@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@gltf-transform/core": "^2.4.7",
     "@types/node": "^18.11.10",
     "@webgpu/types": "^0.1.23",
     "http-server": "^14.1.1",

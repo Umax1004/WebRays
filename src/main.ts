@@ -1,7 +1,16 @@
 import shader from "./assets/shaders/triangle.wgsl"
+import {WebIO} from "@gltf-transform/core"
+import mesh from "./assets/gltf_models/2.0/Avocado/glTF-Binary/Avocado.glb"
 
 const Initialize = async() => {
 
+    const io = new WebIO();
+    console.log(mesh);
+    const avocado = await io.read(mesh);
+    avocado.getRoot().listMeshes().forEach((mesh) => {
+        const primitive = mesh.listPrimitives()[0]; 
+        console.log(primitive.listSemantics());
+      });
     // Initialize important variables
     const canvas : HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("output");
     canvas.width = window.innerWidth;

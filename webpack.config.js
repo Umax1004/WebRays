@@ -23,6 +23,10 @@ module.exports = {
                 use: {
                     loader: "ts-shader-loader"
                 }
+            },
+            {
+                test: /\.glb$/,
+                type: 'asset/resource'
             }
         ]
     },
