@@ -19,7 +19,10 @@ export class GLTFMesh {
     async loadMesh(uri: string) {
         const io = new WebIO();
         this.mesh = await io.read(uri);
-        this.mesh.getRoot().listMeshes().forEach((mesh) => {
+        // const meshes = this.mesh.getRoot().listMeshes();
+        // for(const mesh in meshes)
+        const mesh = this.mesh.getRoot().listMeshes()[0];
+        {
             const primitive = mesh.listPrimitives()[0];
             const indices = primitive.getIndices();
             console.log(indices);
@@ -34,7 +37,7 @@ export class GLTFMesh {
             this.indexBuffer[this.indexBuffer.length -1].unmap();
             this.indiceCount.push(indices!.getArray()!.length);
 
-            const semantics : string[] = ["POSITION", "NORMAL"];
+            const semantics : string[] = ["POSITION", "TEXCOORD_0"];
             semantics.forEach((semantic, index) => {
                 const result = primitive.listSemantics().findIndex(element => element == semantic);
                 if(result == -1)
@@ -88,10 +91,11 @@ export class GLTFMesh {
             if(baseColor)
             {
                 const baseImage = new Image();
-                baseImage.initializeFromGLTF(this.device, baseColor);
+                await baseImage.initializeFromGLTF(this.device, baseColor);
                 this.baseColor.push(baseImage);
+                console.log(material?.getBaseColorTexture());
             }
-            console.log(material?.getBaseColorTexture());
-        });
+        }
+        
     }
 }

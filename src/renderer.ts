@@ -125,9 +125,21 @@ export class Renderer {
                     binding: 0,
                     visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
                     buffer: {}
+                },
+                {
+                    binding: 1,
+                    visibility: GPUShaderStage.FRAGMENT,
+                    texture: {}
+                },
+                {
+                    binding: 2,
+                    visibility: GPUShaderStage.FRAGMENT,
+                    sampler: {}
                 }
             ],
         });
+
+        console.log(this.avocado.baseColor[0].sampler)
     
         this.bindGroup = this.device.createBindGroup({
             layout: bindGroupLayout,
@@ -137,6 +149,14 @@ export class Renderer {
                     resource: {
                         buffer: this.uniformBuffer
                     }
+                },
+                {
+                    binding: 1,
+                    resource: this.avocado.baseColor[0].view
+                },
+                {
+                    binding: 2,
+                    resource: this.avocado.baseColor[0].sampler
                 }
             ]
         });
@@ -188,6 +208,7 @@ export class Renderer {
 
         const model = mat4.create();
         mat4.scale(model, model, [15,15,15]);
+        // mat4.translate(model, model, [0, 0.001, 0]);
         mat4.rotate(model, model, this.t, [0,1,0]);
 
 
