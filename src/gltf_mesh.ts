@@ -1,11 +1,13 @@
 import { WebIO, Document } from "@gltf-transform/core"
 import { NodeArray } from "typescript"
+import { Image } from "./texture"
 
 export class GLTFMesh {
 
     buffer: Array<GPUBuffer> = []
     indexBuffer: Array<GPUBuffer> = []
     indiceCount: Array<number> = []
+    baseColor: Array<Image> = []
     bufferLayoutList: Array<GPUVertexBufferLayout> = []
     mesh!: Document
     device: GPUDevice
@@ -80,6 +82,16 @@ export class GLTFMesh {
                     }
                 );
             });
+
+            const material = primitive.getMaterial();
+            const baseColor = material?.getBaseColorTexture();
+            if(baseColor)
+            {
+                const baseImage = new Image();
+                baseImage.initializeFromGLTF(this.device, baseColor);
+                this.baseColor.push(baseImage);
+            }
+            console.log(material?.getBaseColorTexture());
         });
     }
 }
