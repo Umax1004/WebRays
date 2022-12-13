@@ -1,6 +1,7 @@
-import shader from "./assets/shaders/triangle.wgsl"
-import {WebIO} from "@gltf-transform/core"
+import shader from "./assets/shaders/mesh.wgsl"
+import { WebIO } from "@gltf-transform/core"
 import mesh from "./assets/gltf_models/2.0/Avocado/glTF-Binary/Avocado.glb"
+import { TriangleMesh } from "./triangle_mesh"
 
 const Initialize = async() => {
 
@@ -8,7 +9,8 @@ const Initialize = async() => {
     console.log(mesh);
     const avocado = await io.read(mesh);
     avocado.getRoot().listMeshes().forEach((mesh) => {
-        const primitive = mesh.listPrimitives()[0]; 
+        const primitive = mesh.listPrimitives()[0];
+        console.log(primitive.getIndices());
         console.log(primitive.listSemantics());
       });
     // Initialize important variables
@@ -26,12 +28,28 @@ const Initialize = async() => {
         alphaMode: "opaque"
     });
 
+    const triangleMesh: TriangleMesh = new TriangleMesh(device);
+
+    const bindGroupLayout : GPUBindGroupLayout = device.createBindGroupLayout({
+        entries: [],
+    });
+
+    const bindGroup : GPUBindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: []
+    });
+    
+    const pipelineLayout : GPUPipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [bindGroupLayout]
+    });
+
     const pipeline : GPURenderPipeline = device.createRenderPipeline({
         vertex : {
             module : device.createShaderModule({
                 code : shader
             }),
-            entryPoint : "vs_main"
+            entryPoint : "vs_main",
+            buffers : [triangleMesh.bufferLayout]
         },
 
         fragment : {
@@ -48,7 +66,7 @@ const Initialize = async() => {
             topology : "triangle-list"
         },
 
-        layout : "auto"
+        layout : pipelineLayout
     });
 
     const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
@@ -63,6 +81,8 @@ const Initialize = async() => {
     });
 
     renderpass.setPipeline(pipeline);
+    renderpass.setBindGroup(0, bindGroup);
+    renderpass.setVertexBuffer(0, triangleMesh.buffer);
     renderpass.draw(3, 1, 0, 0);
     renderpass.end();
     
