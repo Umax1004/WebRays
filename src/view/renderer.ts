@@ -1,9 +1,9 @@
-import shader from "./assets/shaders/mesh.wgsl"
+import shader from "../assets/shaders/mesh.wgsl"
 import { TriangleMesh } from "./triangle_mesh"
 import { mat4 } from "gl-matrix"
 import { GLTFMesh } from "./gltf_mesh"
 import { WebIO } from "@gltf-transform/core"
-import mesh from "./assets/gltf_models/2.0/Avocado/glTF-Binary/Avocado.glb"
+import mesh from "../assets/gltf_models/2.0/Avocado/glTF-Binary/Avocado.glb"
 
 export class Renderer {
     canvas: HTMLCanvasElement;

@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { Renderer } from "./view/renderer";
 
 const canvas : HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("output");
 canvas.width = window.innerWidth;
