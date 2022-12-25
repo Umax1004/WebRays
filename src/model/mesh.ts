@@ -11,14 +11,14 @@ export class Mesh {
         this.eulers = eulers;
         this.scale = scale;
         this.model = mat4.create();
-    }
-
-    update() {
         mat4.scale(this.model, this.model, this.scale);
         mat4.rotateX(this.model, this.model, this.eulers[0]);
         mat4.rotateY(this.model, this.model, this.eulers[1]);
         mat4.rotateZ(this.model, this.model, this.eulers[2]);
         mat4.translate(this.model, this.model, this.position);
+    }
+
+    update() {
     }
 
     get_model(): mat4 {

@@ -1,9 +1,10 @@
-import { Renderer } from "./view/renderer";
+import { App } from "./control/app";
 
 const canvas : HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("output");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const renderer = new Renderer(canvas);
+const app : App = new App(canvas);
 
-renderer.Initialize();
+app.initialize();
+// app.run();

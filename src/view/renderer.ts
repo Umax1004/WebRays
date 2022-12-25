@@ -4,6 +4,8 @@ import { mat4 } from "gl-matrix"
 import { GLTFMesh } from "./gltf_mesh"
 import { WebIO } from "@gltf-transform/core"
 import mesh from "../assets/gltf_models/2.0/Avocado/glTF-Binary/Avocado.glb"
+import { Camera } from "../model/camera"
+import { Mesh } from "../model/mesh"
 
 export class Renderer {
     canvas: HTMLCanvasElement;
@@ -29,8 +31,6 @@ export class Renderer {
     triangleMesh!: TriangleMesh;
     avocado!: GLTFMesh;
 
-    t: number = 0.0;
-
     constructor(canvas: HTMLCanvasElement){
         this.canvas = canvas;
     }
@@ -44,21 +44,20 @@ export class Renderer {
         await this.makeDepthBufferResources();
     
         await this.makePipeline();
-
-        this.render();
     }
 
     async setupDevice() {
-        const io = new WebIO();
-        console.log(mesh);
-        const avocado = await io.read(mesh);
-        avocado.getRoot().listMeshes().forEach((mesh) => {
-            const primitive = mesh.listPrimitives()[0];
-            console.log(primitive.getIndices());
-            console.log(primitive.listSemantics());
-        });
+        // const io = new WebIO();
+        // console.log(mesh);
+        // const avocado = await io.read(mesh);
+        // avocado.getRoot().listMeshes().forEach((mesh) => {
+        //     const primitive = mesh.listPrimitives()[0];
+        //     console.log(primitive.getIndices());
+        //     console.log(primitive.listSemantics());
+        // });
         this.adapter = <GPUAdapter> await navigator.gpu?.requestAdapter();
         this.device = <GPUDevice> await this.adapter?.requestDevice();
+        console.log("Here");
         this.context = <GPUCanvasContext> this.canvas.getContext("webgpu");
         this.format = "bgra8unorm";
         this.context.configure({
@@ -193,26 +192,28 @@ export class Renderer {
         });
     }
 
-    render = () => {
-
-        this.t += 0.01;
-        if (this.t > 2.0 * Math.PI) {
-            this.t -= 2.0 * Math.PI;
-        }
+    async render(camera: Camera, meshes: Mesh[]) {
         
         const projection = mat4.create();
         mat4.perspective(projection, Math.PI/4, this.canvas.width/this.canvas.height, 0.1, 10);
 
-        const view = mat4.create();
-        mat4.lookAt(view, [-2, 0, 2], [0, 0, 0], [0, 0, 1]);
-
-        const model = mat4.create();
-        mat4.scale(model, model, [15,15,15]);
+        // const model = mat4.create();
+        // mat4.scale(model, model, [15,15,15]);
         // mat4.translate(model, model, [0, 0.001, 0]);
-        mat4.rotate(model, model, this.t, [0,1,0]);
+        // mat4.rotate(model, model, this.t, [0,1,0]);
+
+        const model = meshes[0].get_model();
+        const view = camera.get_view();
+        // mat4.lookAt(view, [-2, 0, 2], [0, 0, 0], [0, 0, 1]);
 
 
-        this.device.queue.writeBuffer(this.uniformBuffer, 0, <ArrayBuffer>model); 
+        // meshes.forEach(
+        //     (mesh) => {
+        //         const model: mat4 = mesh.get_model();
+        //         this.device.queue.writeBuffer(this.uniformBuffer, 0, <ArrayBuffer>model); 
+        //     }
+        // );
+        this.device.queue.writeBuffer(this.uniformBuffer, 0, <ArrayBuffer>model);
         this.device.queue.writeBuffer(this.uniformBuffer, 64, <ArrayBuffer>view); 
         this.device.queue.writeBuffer(this.uniformBuffer, 128, <ArrayBuffer>projection);
 
@@ -242,6 +243,6 @@ export class Renderer {
         
         this.device.queue.submit([commandEncoder.finish()]);
 
-        requestAnimationFrame(this.render);
+        // requestAnimationFrame(this.render);
     }
 }
